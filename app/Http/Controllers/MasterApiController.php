@@ -12,28 +12,27 @@ use Illuminate\Support\Facades\Storage;
 
 class MasterApiController extends BaseController
 {
-   
+
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
+
     public function index()
     {
         $data = $this->model->all();
         return response()->json($data);
     }
 
-
-
     public function store(Request $request)
     {
-        $this->validate($request, $this->cliente->rules());
+        $this->validate($request, $this->model->rules());
 
         $dataForm = $request->all();
 
-        if ($request->hasFile('image') && $request->file('image')->isValid()) {
+        if ($request->hasFile($this->upload) && $request->file($this->upload)->isValid()) {
             $extension = $request->image->extension();
 
             $name = uniqid(date('His'));
             $nameFile = "{$name}.{$extension}";
-            $upload = Image::make($dataForm['image'])->resize(177, 236)->save(storage_path("app/public/clientes/$nameFile", 70));
+            $upload = Image::make($dataForm['image'])->resize($this->widht, $this->height)->save(storage_path("app/public/clientes/$nameFile", 70));
 
             if (!$upload) {
                 return response()->json(['error' => 'falha ao fazer upload'], 500);
@@ -42,7 +41,7 @@ class MasterApiController extends BaseController
             }
         }
 
-        $data = $this->cliente->create($dataForm);
+        $data = $this->model->create($dataForm);
 
         return response()->json($data, 201);
     }
@@ -50,7 +49,7 @@ class MasterApiController extends BaseController
 
     public function show($id)
     {
-        if (!$data = $this->cliente->find($id)) {
+        if (!$data = $this->model->find($id)) {
             return response()->json(['error' => 'Nada foi encontrado'], 404);
         } else {
             return response()->json($data);
@@ -60,10 +59,10 @@ class MasterApiController extends BaseController
 
     public function update(Request $request, $id)
     {
-        if (!$data = $this->cliente->find($id))
+        if (!$data = $this->model->find($id))
             return response()->json(['error' => 'Nada foi encontrado'], 404);
 
-        $this->validate($request, $this->cliente->rules());
+        $this->validate($request, $this->model->rules());
 
         $dataForm = $request->all();
 
@@ -77,7 +76,7 @@ class MasterApiController extends BaseController
 
             $name = uniqid(date('His'));
             $nameFile = "{$name}.{$extension}";
-            $upload = Image::make($dataForm['image'])->resize(177, 236)->save(storage_path("app/public/clientes/$nameFile", 70));
+            $upload = Image::make($dataForm['image'])->resize($this->widht, $this->height)->save(storage_path("app/public/{$this->path}/{$nameFile}", 70));
 
             if (!$upload) {
                 return response()->json(['error' => 'falha ao fazer upload'], 500);
@@ -95,12 +94,14 @@ class MasterApiController extends BaseController
     public function destroy($id)
     {
 
-        if (!$data = $this->cliente->find($id))
+        if ($data = $this->model->find($id)) {
+            if (method_exists($this->model, 'arquivo')) {
+                Storage::disk('public')->delete("/{$this->path}/{$this->model->arquivo($id)}");
+            }
+            $data->delete();
+            return response()->json(['sucess' => 'Deletado com sucesso']);
+        } else {
             return response()->json(['error' => 'Nada foi encontrado'], 404);
-        if ($data->image) {
-            Storage::disk('public')->delete("/clientes/$data->image");
         }
-        $data->delete();
-        return response()->json(['sucess' => 'Deletado com sucesso']);
     }
 }
