@@ -9,7 +9,7 @@ use App\Http\Controllers\Api\AuthenticateController;
 
 //Route::get('/clientes', [ClienteApiController::class, 'index']);
 
-Route::post('login', [AuthenticateController::class, 'authenticate']);
+//Route::post('login', [AuthenticateController::class, 'authenticate']);
 //$this->post('login', 'AuthenticateController@authenticate');
 
 
