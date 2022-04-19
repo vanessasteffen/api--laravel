@@ -5,11 +5,11 @@ use App\Http\Controllers\Api\ClienteApiController;
 use App\Http\Controllers\Api\DocumentoApiController;
 use App\Http\Controllers\Api\TelefoneApiController;
 use App\Http\Controllers\Api\FilmeApiController;
-use App\Http\Controllers\Api\AuthenticateController;
+use App\Http\Controllers\AuthenticateController;
 
 //Route::get('/clientes', [ClienteApiController::class, 'index']);
 
-//Route::post('login', [AuthenticateController::class, 'authenticate']);
+Route::post('login', [AuthenticateController::class, 'authenticate']);
 //$this->post('login', 'AuthenticateController@authenticate');
 
 

@@ -16,7 +16,7 @@ protected $fillable = [
     ];
 
     protected $hidden = [
-        'password', 'remeber_token',
+        'password', 'remember_token',
     ];
 
     public function getJWTIdentifier()
